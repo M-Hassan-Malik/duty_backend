@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const Controller = require("../controllers");
 
-router.get(`/asasas`, Controller.User.setDuty);
+router.post(`/verify`, Controller.User.verify);
+router.post(`/signup`, Controller.User.signup);
+router.get(`/signin`, Controller.User.signin);
 
 module.exports = router;
