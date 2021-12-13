@@ -1,11 +1,21 @@
 const fsAdmin = require("firebase-admin");
+const uuid = require("uuid");
 
 exports.setDuty = async (req, res) => {
+
 	try {
 		const data = req.body;
+		console.log({data});
 		const date = Date(data.date);
 		data.date = fsAdmin.firestore.Timestamp.fromDate(new Date(date));
 		data.createdOn = fsAdmin.firestore.FieldValue.serverTimestamp();
+		const dataMap = {
+			uid: data.uid,
+			place: data.place,
+			duty: data,
+			comments: {},
+			offers: {},
+		};
 
 		const db = fsAdmin.firestore();
 
@@ -14,11 +24,8 @@ exports.setDuty = async (req, res) => {
 			.doc(data.country)
 			.collection(data.city)
 			.doc("active_duties")
-			.collection(data.uid)
-			.doc("tasks")
-			.collection("my_task")
-			.doc()
-			.set(data);
+			.collection("task")
+			.add(dataMap);
 
 		res.status(200).json({ result: "done" });
 	} catch (e) {
@@ -27,22 +34,52 @@ exports.setDuty = async (req, res) => {
 	}
 };
 
-exports.getDuties = (req, res) => {
+exports.getDuties = async (req, res) => {
 	try {
-		const result = fsAdmin
+		const result = await fsAdmin
 			.firestore()
 			.collection("duty")
 			.doc("Pakistan")
 			.collection("Karachi City")
 			.doc("active_duties")
-			.collection("fFLzPABNDAT0v2KZrif6ot1ObPy2")
-			.doc("tasks")
-			.collection("my_task")
+			.collection("task")
 			.get();
 
 		var sendData = [];
-		result.forEach((doc) => sendData.push(doc.data()));
+		result.forEach((doc) => {
+			sendData.push({
+				docId: doc.id,
+				docData: doc.data(),
+			});
+		});
+
 		res.status(200).json({ result: sendData });
+	} catch (e) {
+		console.log(e);
+		res.status(400).json({ error: e });
+	}
+};
+
+exports.addOffer = (req, res) => {
+	try {
+		const data = req.body;
+		console.log(data.country);
+		const result = fsAdmin
+			.firestore()
+			.collection("duty")
+			.doc(data.country)
+			.collection(data.city)
+			.doc("active_duties")
+			.collection("task")
+			.doc(data.toDuty)
+			.update({
+				offers: fsAdmin.firestore.FieldValue.arrayUnion({
+					offeredBy: data.byUser,
+					offeredMoney: data.offer,
+				}),
+			});
+
+		res.status(200).json({ result: "done" });
 	} catch (e) {
 		console.log(e);
 		res.status(400).json({ error: e });
@@ -51,16 +88,70 @@ exports.getDuties = (req, res) => {
 
 exports.addComment = (req, res) => {
 	try {
-		const result = fsAdmin
+		const data = {
+			timestamp: Date.now(),
+			parent: req.body.parent,
+			userId: req.body.userId,
+			comment: req.body.comment,
+			replies : []
+		};
+		console.log(data);
+		req.body.parent === true
+			? fsAdmin
+					.firestore()
+					.collection("duty")
+					.doc("Pakistan")
+					.collection("Karachi City")
+					.doc("comments")
+					.collection("n226Ha6TnoSgKjnWnwZa") //Duty's Id
+					.add(data) //sort by time
+			: fsAdmin
+					.firestore()
+					.collection("duty")
+					.doc("Pakistan")
+					.collection("Karachi City")
+					.doc("comments")
+					.collection("n226Ha6TnoSgKjnWnwZa")
+					.doc(req.body.docId)
+					.update({
+						replies: fsAdmin.firestore.FieldValue.arrayUnion(data),
+					});
+
+		res.status(200).json({ result: "ok" });
+	} catch (e) {
+		console.log(e);
+		res.status(400).json({ error: e });
+	}
+};
+
+exports.getComments = async (req, res) => {
+	try {
+		const result = await fsAdmin
 			.firestore()
 			.collection("duty")
-			.doc(
-				"/Pakistan/Karachi City/active_duties/fFLzPABNDAT0v2KZrif6ot1ObPy2/tasks/my_task/geNY5jrRKh78E0FSeQGk"
-			)
-			.update("Cosmments", firestore.FieldValue.arrayUnion("sdsd"), {
-				merge: true,
+			.doc("Pakistan")
+			.collection("Karachi City")
+			.doc("comments")
+			.collection(req.params.parentDocId)
+			.get();
+
+		const comments = [];
+		result.forEach((doc) => {
+			var replies = doc.data().replies.sort((a, b) => {
+				return a.timestamp - b.timestamp;
 			});
-		res.status(200).json({ result: result });
+			comments.push({
+				docId: doc.id,
+				docData: {
+					timestamp: doc.data().timestamp,
+					parent: doc.data().parent,
+					userId: doc.data().userId,
+					comment: doc.data().comment,
+				},
+				reply: replies,
+			});
+		});
+		res.status(200).json({ result: comments });
 	} catch (e) {
 		console.log(e);
 		res.status(400).json({ error: e });
