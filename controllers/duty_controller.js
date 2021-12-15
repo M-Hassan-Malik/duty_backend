@@ -5,10 +5,10 @@ exports.setDuty = async (req, res) => {
 
 	try {
 		const data = req.body;
-		console.log({data});
-		const date = Date(data.date);
+		const date = new Date(data.date);
 		data.date = fsAdmin.firestore.Timestamp.fromDate(new Date(date));
 		data.createdOn = fsAdmin.firestore.FieldValue.serverTimestamp();
+
 		const dataMap = {
 			uid: data.uid,
 			place: data.place,
@@ -95,7 +95,6 @@ exports.addComment = (req, res) => {
 			comment: req.body.comment,
 			replies : []
 		};
-		console.log(data);
 		req.body.parent === true
 			? fsAdmin
 					.firestore()
@@ -103,7 +102,7 @@ exports.addComment = (req, res) => {
 					.doc("Pakistan")
 					.collection("Karachi City")
 					.doc("comments")
-					.collection("n226Ha6TnoSgKjnWnwZa") //Duty's Id
+					.collection(req.body.dutyId) //Duty's Id
 					.add(data) //sort by time
 			: fsAdmin
 					.firestore()
@@ -111,7 +110,7 @@ exports.addComment = (req, res) => {
 					.doc("Pakistan")
 					.collection("Karachi City")
 					.doc("comments")
-					.collection("n226Ha6TnoSgKjnWnwZa")
+					.collection(req.body.dutyId)
 					.doc(req.body.docId)
 					.update({
 						replies: fsAdmin.firestore.FieldValue.arrayUnion(data),
