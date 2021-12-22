@@ -36,6 +36,7 @@ exports.setDuty = async (req, res) => {
 
 exports.getDuties = async (req, res) => {
 	try {
+		
 		const result = await fsAdmin
 			.firestore()
 			.collection("duty")
@@ -63,7 +64,6 @@ exports.getDuties = async (req, res) => {
 exports.addOffer = (req, res) => {
 	try {
 		const data = req.body;
-		console.log(data.country);
 		const result = fsAdmin
 			.firestore()
 			.collection("duty")
@@ -75,6 +75,7 @@ exports.addOffer = (req, res) => {
 			.update({
 				offers: fsAdmin.firestore.FieldValue.arrayUnion({
 					offeredBy: data.byUser,
+					userName: data.userName,
 					offeredMoney: data.offer,
 				}),
 			});
