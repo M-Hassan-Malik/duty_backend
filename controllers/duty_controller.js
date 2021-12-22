@@ -2,8 +2,8 @@ const fsAdmin = require("firebase-admin");
 const uuid = require("uuid");
 
 exports.setDuty = async (req, res) => {
-
 	try {
+
 		const data = req.body;
 		const date = new Date(data.date);
 		data.date = fsAdmin.firestore.Timestamp.fromDate(new Date(date));
@@ -29,7 +29,7 @@ exports.setDuty = async (req, res) => {
 
 		res.status(200).json({ result: "done" });
 	} catch (e) {
-		console.log(e);
+		console.log(e);	
 		res.status(400).json({ error: e });
 	}
 };
