@@ -3,9 +3,7 @@ const app = express();
 const fsAdmin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey.json");
 require("dotenv").config();
-
 var cors = require("cors");
-
 
 app.use(
 	cors({
