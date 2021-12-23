@@ -1,6 +1,11 @@
 const fsAdmin = require("firebase-admin");
 const uuid = require("uuid");
 
+exports.checkAPI = (req,res) =>{
+console.log("API working");
+res.send("Server Is Working!");
+};
+
 exports.setDuty = async (req, res) => {
 	try {
 
@@ -16,7 +21,7 @@ exports.setDuty = async (req, res) => {
 			comments: {},
 			offers: {},
 		};
-
+		
 		const db = fsAdmin.firestore();
 
 		const result = await db

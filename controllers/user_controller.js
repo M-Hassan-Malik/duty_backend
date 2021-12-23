@@ -33,22 +33,21 @@ exports.verify = (req, res) => {
 	});
 };
 
-exports.signup = (req, res) => {
+exports.signup = async (req, res) => {
 	try {
 	const data = req.body;
 	const location = JSON.parse(data.address);
 	console.log(data);
-		const user = fsAdmin.auth().createUser({
+		const user = await fsAdmin.auth().createUser({
 			email: data.email.replace(/\s/g, ""),
 			emailVerified: true,
-			phoneNumber: "+922313038465",
 			password: data.password,
 			displayName: data.name + " " + data.last_name,
 			photoURL: "http://www.example.com/12345678/photo.png",
 			disabled: false,
 			customClaims: { roleId: 1 },
 		});
-		fsAdmin
+		await fsAdmin
 			.firestore()
 			.collection("duty")
 			.doc(location.country)
