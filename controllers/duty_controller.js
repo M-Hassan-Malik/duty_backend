@@ -1,14 +1,13 @@
 const fsAdmin = require("firebase-admin");
 const uuid = require("uuid");
 
-exports.checkAPI = (req,res) =>{
-console.log("API working");
-res.send("Server Is Working!");
+exports.checkAPI = (req, res) => {
+	console.log("API working");
+	res.send("Server Is Working!");
 };
 
 exports.setDuty = async (req, res) => {
 	try {
-
 		const data = req.body;
 		const date = new Date(data.date);
 		data.date = fsAdmin.firestore.Timestamp.fromDate(new Date(date));
@@ -21,7 +20,7 @@ exports.setDuty = async (req, res) => {
 			comments: {},
 			offers: {},
 		};
-		
+
 		const db = fsAdmin.firestore();
 
 		const result = await db
@@ -34,14 +33,34 @@ exports.setDuty = async (req, res) => {
 
 		res.status(200).json({ result: "done" });
 	} catch (e) {
-		console.log(e);	
+		console.log(e);
+		res.status(400).json({ error: e });
+	}
+};
+
+exports.assignDuty = async (req, res) => {
+	try {
+		const data = req.body;
+		data.assignedOn = fsAdmin.firestore.FieldValue.serverTimestamp();
+		await fsAdmin
+			.firestore()
+			.collection("duty")
+			.doc(data.country)
+			.collection(data.city)
+			.doc("active_duties")
+			.collection("task")
+			.doc(data.docId)
+			.update({ status: data });
+
+		res.status(200).json({ result: "done" });
+	} catch (e) {
+		console.log(e);
 		res.status(400).json({ error: e });
 	}
 };
 
 exports.getDuties = async (req, res) => {
 	try {
-		
 		const result = await fsAdmin
 			.firestore()
 			.collection("duty")
@@ -99,7 +118,7 @@ exports.addComment = (req, res) => {
 			parent: req.body.parent,
 			userId: req.body.userId,
 			comment: req.body.comment,
-			replies : []
+			replies: [],
 		};
 		req.body.parent === true
 			? fsAdmin
