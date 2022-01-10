@@ -181,3 +181,32 @@ exports.getComments = async (req, res) => {
 		res.status(400).json({ error: e });
 	}
 };
+
+exports.getOffers = async (req, res) => {
+	try {
+		const result = await fsAdmin
+			.firestore()
+			.collection("duty")
+			.doc(req.body.country)
+			.collection(req.body.city)
+			.doc("active_duties")
+			.collection("task")
+			.doc(req.body.docId)
+			.get();
+
+		const offers = [];
+		result.forEach((doc) => {
+			var offer = doc.data().offers.sort((a, b) => {
+				return a.timestamp - b.timestamp;
+			});
+			offer.push({
+				docId: doc.id,
+				offer: offer,
+			});
+		});
+		res.status(200).json({ result: offers });
+	} catch (e) {
+		console.log(e);
+		res.status(400).json({ error: e });
+	}
+};
