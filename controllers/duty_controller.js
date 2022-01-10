@@ -199,10 +199,7 @@ exports.getOffers = async (req, res) => {
 			var offer = doc.data().offers.sort((a, b) => {
 				return a.timestamp - b.timestamp;
 			});
-			offer.push({
-				docId: doc.id,
-				offer: offer,
-			});
+			offers.push(offer);
 		});
 		res.status(200).json({ result: offers });
 	} catch (e) {
