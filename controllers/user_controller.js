@@ -35,9 +35,9 @@ exports.verify = (req, res) => {
 
 exports.signup = async (req, res) => {
 	try {
-	const data = req.body;
-	const location = JSON.parse(data.address);
-	console.log(data);
+		const data = req.body;
+		const location = JSON.parse(data.address);
+		console.log(data);
 		const user = await fsAdmin.auth().createUser({
 			email: data.email.replace(/\s/g, ""),
 			emailVerified: true,
@@ -75,4 +75,31 @@ exports.signup = async (req, res) => {
 exports.signin = (req, res) => {
 	console.log("checking go!");
 	res.send("API wordking");
+};
+exports.getUserDuty = async (req, res) => {
+	try {
+		const data = req.body;
+		const result = await fsAdmin
+			.firestore()
+			.collection("duty")
+			.doc(data.country)
+			.collection(data.city)
+			.doc("active_duties")
+			.collection("task")
+			.where("uid", "==", data.uid)
+			.get();
+
+		var sendData = [];
+		result.forEach((doc) => {
+			sendData.push({
+				docId: doc.id,
+				docData: doc.data(),
+			});
+		});
+
+			res.status(200).json({ result: sendData });
+	} catch (e) {
+		console.log(e);
+		res.status(400).json({ error: e });
+	}
 };
