@@ -25,18 +25,18 @@ app.use("/duty", require("./api/duty"));
 app.use("/duty_history", require("./api/duty_history"));
 
 
-exec("lt --port 3000 --subdomain 'hello'", (error, stdout, stderr) => {
-    if (error) {
-        console.log(`error: ${error.message}`);
-        return;
-    }
-    if (stderr) {
-        console.log(`stderr: ${stderr}`);
-        return;
-    }
-    console.log(`stdout: ${stdout}`);
-});
+// exec("lt --port 3000 --subdomain 'hello'", (error, stdout, stderr) => {
+//     if (error) {
+//         console.log(`error: ${error.message}`);
+//         return;
+//     }
+//     if (stderr) {
+//         console.log(`stderr: ${stderr}`);
+//         return;
+//     }
+//     console.log(`stdout: ${stdout}`);
+// });
 
 app.listen(process.env.PORT || 3000, () => {
-	console.log(`Server is running on localhost:300`);
+	console.log(`Server is running on localhost:3000`);
 });

@@ -184,7 +184,7 @@ exports.getComments = async (req, res) => {
 
 exports.getOffers = async (req, res) => {
 	try {
-		const result = await fsAdmin
+		const document = await fsAdmin
 			.firestore()
 			.collection("duty")
 			.doc(req.body.country)
@@ -194,13 +194,10 @@ exports.getOffers = async (req, res) => {
 			.doc(req.body.docId)
 			.get();
 
-		const offers = [];
-		result.forEach((doc) => {
-			var offer = doc.data().offers.sort((a, b) => {
-				return a.timestamp - b.timestamp;
-			});
-			offers.push(offer);
+		var offers = document.data().offers.sort((a, b) => {
+			return b.offeredMoney - a.offeredMoney;
 		});
+
 		res.status(200).json({ result: offers });
 	} catch (e) {
 		console.log(e);
