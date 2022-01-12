@@ -61,11 +61,12 @@ exports.assignDuty = async (req, res) => {
 
 exports.getDuties = async (req, res) => {
 	try {
+		
 		const result = await fsAdmin
 			.firestore()
 			.collection("duty")
-			.doc("Pakistan")
-			.collection("Karachi City")
+			.doc(req.body.country)
+			.collection(req.body.city)
 			.doc("active_duties")
 			.collection("task")
 			.get();
@@ -124,16 +125,16 @@ exports.addComment = (req, res) => {
 			? fsAdmin
 					.firestore()
 					.collection("duty")
-					.doc("Pakistan")
-					.collection("Karachi City")
+					.doc(req.body.country)
+					.collection(req.body.city)
 					.doc("comments")
 					.collection(req.body.dutyId) //Duty's Id
 					.add(data) //sort by time
 			: fsAdmin
 					.firestore()
 					.collection("duty")
-					.doc("Pakistan")
-					.collection("Karachi City")
+					.doc(req.body.country)
+					.collection(req.body.city)
 					.doc("comments")
 					.collection(req.body.dutyId)
 					.doc(req.body.docId)
@@ -193,14 +194,15 @@ exports.getOffers = async (req, res) => {
 			.collection("task")
 			.doc(req.body.docId)
 			.get();
-
-		var offers = document.data().offers.sort((a, b) => {
-			return b.offeredMoney - a.offeredMoney;
-		});
-
-		res.status(200).json({ result: offers });
+		
+		if (document.data().offers) {
+			var offers = document.data().offers.sort((a, b) => {
+				return b.offeredMoney - a.offeredMoney;
+			});
+			res.status(200).json({ result: offers });
+		} else res.status(204).json({ result: 'empty' });
 	} catch (e) {
 		console.log(e);
-		res.status(400).json({ error: e });
+		res.status(400).json({ error: 'server error' });
 	}
 };
