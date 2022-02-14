@@ -9,6 +9,6 @@ router.post('/addOffer', Controller.Duty.addOffer);
 router.post('/getOffers', Controller.Duty.getOffers);
 router.post(`/getDuty`, Controller.Duty.getDuties);
 
-router.get(`/getComments/:parentDocId`, Controller.Duty.getComments);
+router.post(`/getComments`, Controller.Duty.getComments);
 
 module.exports = router;

@@ -17,8 +17,6 @@ exports.setDuty = async (req, res) => {
       uid: data.uid,
       place: data.place,
       duty: data,
-      comments: {},
-      offers: {},
     };
 
     const db = fsAdmin.firestore();
@@ -162,10 +160,10 @@ exports.getComments = async (req, res) => {
     const result = await fsAdmin
       .firestore()
       .collection("duty")
-      .doc("Pakistan")
-      .collection("Karachi City")
+      .doc(req.body.country)
+      .collection(req.body.city)
       .doc("comments")
-      .collection(req.params.parentDocId)
+      .collection(req.body.parentDocId)
       .get();
 
     const comments = [];

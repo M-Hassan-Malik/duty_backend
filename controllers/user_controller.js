@@ -76,8 +76,10 @@ exports.signin = (req, res) => {
   console.log("checking go!");
   res.send("API wordking");
 };
+
 exports.getUserDuty = async (req, res) => {
   try {
+    console.log('run huwa');
     const data = req.body;
     const result = await fsAdmin
       .firestore()
